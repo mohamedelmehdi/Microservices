@@ -1,0 +1,57 @@
+﻿# .NET specific
+bin/
+obj/
+*.swp
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+.containers/
+
+# Logs
+*.log
+logs/
+
+# Docker specific
+docker-compose.override.yml
+docker-compose.override.*.yml
+**/.docker/
+**/Dockerfile
+**/docker-compose.yml
+.env
+
+# Visual Studio Code settings
+.vscode/
+.vs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Rider IDE files
+.idea/
+.idea_modules/
+.idea_settings/
+
+# Packages
+*.nupkg
+*.snupkg
+
+# Resharper files
+_ReSharper*/
+*.DotSettings.user
+
+# Windows image file caches
+*.dll
+*.pdb
+
+# Coverage Reports
+coverage/
+*.coverage
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+
+# Include these if you

@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  orders.api:
+    image: ${DOCKER_REGISTRY-}ordersapi
+    container_name: orders.api
+    build:
+      context: .
+      dockerfile: Orders.Api/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+  products.database:
+    image: postgres:latest
+    container_name: products.database
+    environment:
+      - POSTGRES_DB=OrdersDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/orders-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
