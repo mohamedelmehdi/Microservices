@@ -1,0 +1,116 @@
+services:
+  gateway.api:
+    image: ${DOCKER_REGISTRY-}gatewayapi
+    container_name: gateway.api
+    build:
+      context: .
+      dockerfile: Gateway.Api/Dockerfile
+    ports:
+      - "5900:5900"
+      - "5901:5901"
+    networks:
+      - proxybackend
+  orders.api:
+    image: ${DOCKER_REGISTRY-}ordersapi
+    container_name: orders.api
+    build:
+      context: .
+      dockerfile: Orders.Api/Dockerfile
+    ports:
+      - "5100:5100"
+      - "5101:5101"
+    depends_on:
+      - orders.database
+    networks:
+      - proxybackend
+  orders.database:
+    image: postgres:latest
+    container_name: orders.database
+    environment:
+      - POSTGRES_DB=OrdersDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./database/orders-db:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5020:5432"
+    networks:
+      - proxybackend
+
+  orders.cache:
+    container_name: orders.cache
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - proxybackend
+
+  products1.api:
+    image: ${DOCKER_REGISTRY-}productsapi
+    container_name: products1.api
+    build:
+      context: .
+      dockerfile: Products.Api/Dockerfile
+    ports:
+      - "5300:5300"
+      - "5301:5301"
+    networks:
+      - proxybackend
+  products2.api:
+    image: ${DOCKER_REGISTRY-}productsapi
+    container_name: products2.api
+    build:
+      context: .
+      dockerfile: Products.Api/Dockerfile
+    ports:
+      - "6300:6300"
+      - "6301:6301"
+    networks:
+      - proxybackend
+  products3.api:
+    image: ${DOCKER_REGISTRY-}productsapi
+    container_name: products3.api
+    build:
+      context: .
+      dockerfile: Products.Api/Dockerfile
+    ports:
+      - "7300:7300"
+      - "7301:7301"
+    networks:
+      - proxybackend
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: orders.database
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_DB_SCHEMA: public
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: 'true'
+      # KC_HOSTNAME: keycloak.heyvaldemar.net
+      KC_HTTP_ENABLED: 'true'
+      KC_PROXY_HEADERS: 'xforwarded'
+      PROXY_ADDRESS_FORWARDING: 'true'
+    volumes:
+      - ./database/keycloak-db:/opt/keycloak/data
+    depends_on:
+      - orders.database
+    ports:
+      - "7200:8080"
+    networks:
+      - proxybackend
+
+networks:
+    proxybackend:
+      name: proxybackend
+      driver: bridge
+
+
